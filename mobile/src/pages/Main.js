@@ -14,7 +14,7 @@ function Main({ navigation }){
 
     useEffect(() => {
         async function loadInitialPosition(){
-            const {granted} = await requestPermissionsAsync();
+            const { granted } = await requestPermissionsAsync();
 
             if (granted){
 
@@ -49,7 +49,7 @@ function Main({ navigation }){
 
         console.log(response.data);
         
-        setDevs(response.data.devs);
+        setDevs(response.data);
     }
     function handleRegionChange(region){
         setCurrentRegion(region)
