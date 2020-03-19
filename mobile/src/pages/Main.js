@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-// import { View } from 'react-native';
 import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity } from 'react-native'
 import MapView, { Marker, Callout } from 'react-native-maps'
 import { requestPermissionsAsync, getCurrentPositionAsync} from 'expo-location'
 import { MaterialIcons } from  '@expo/vector-icons'
 
 import api from '../services/api'
+import { connect, disconnect, subscribeToNewDevs } from '../services/socket'
+
 
 function Main({ navigation }){
     const [devs, setDevs] = useState([]);
@@ -36,6 +37,22 @@ function Main({ navigation }){
         loadInitialPosition();
     }, []);
 
+    useEffect(() =>{
+        subscribeToNewDevs(dev => setDevs([...devs, dev]))
+    },[devs])
+
+    function setupWebSocket(){
+        disconnect()
+
+        const { latitude, longitude } = currentRegion
+
+        connect({
+            latitude,
+            longitude,
+            techs
+        })
+    }
+
     async function loadDevs() {
         const { latitude, longitude } = currentRegion;
 
@@ -50,7 +67,11 @@ function Main({ navigation }){
         console.log(response.data);
         
         setDevs(response.data);
+        setupWebSocket();
     }
+
+
+
     function handleRegionChange(region){
         setCurrentRegion(region)
     }
@@ -112,10 +133,10 @@ const styles = StyleSheet.create({
     },
 
     avatar: {
-        width: 54,
+        width: 70,
         height: 54,
         borderRadius: 4,
-        borderWidth: 4,
+        borderWidth: 6,
         borderColor: '#BF0436',
     },
 
